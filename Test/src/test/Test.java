@@ -1,40 +1,86 @@
 package test;
 
-import net.ddns.sharhar.tcp.TcpClient;
-import net.ddns.sharhar.tcp.TcpClientCallback;
-import net.ddns.sharhar.tcp.TcpServer;
-import net.ddns.sharhar.tcp.TcpServerCallback;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
-public class Test implements TcpServerCallback, TcpClientCallback{
+import net.ddns.sharhar.udp.UdpServer;
+import net.ddns.sharhar.udp.UdpServerCallback;
+
+public class Test implements UdpServerCallback{
 	public static void main(String[] args) {
 		new Test();
 	}
 	
-	TcpServer server;
-	TcpClient client;
+	UdpServer server;
 	
-	public Test() {
-		server = new TcpServer(5000, this);
-		client = new TcpClient("localhost", 5000, this);
+	public Test(){
+		server = new UdpServer(5000, this);
 		server.start();
-		client.start();
+		
+		InetAddress address = null;
+		DatagramSocket socket = null;
+		DatagramPacket packet = null;
+		
+		try {
+			address = InetAddress.getLocalHost();
+			socket = new DatagramSocket();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} 
+		
+		packet = new DatagramPacket(("hello").getBytes(), 5, address, 5000);
+		try {
+			socket.send(packet);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		socket.close();
+		
+		try {
+			address = InetAddress.getLocalHost();
+			socket = new DatagramSocket();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} 
+		
+		packet = new DatagramPacket(("hello").getBytes(), 5, address, 5000);
+		try {
+			socket.send(packet);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		socket.close();
+		
+		try {
+			address = InetAddress.getLocalHost();
+			socket = new DatagramSocket();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} 
+		
+		packet = new DatagramPacket(("hello").getBytes(), 5, address, 5000);
+		try {
+			socket.send(packet);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		socket.close();
 	}
-	
-	public void recivedData(int id, String data) {
-		System.out.println("SERVER>> Client " + id + " sent: " + data);
-	}
-	
-	public void connected(int id) {
-		System.out.println("SERVER>> new client " + id);
-		server.clients.get(id).sendData("PING");
-	}
-	
-	public void connected() {
-		System.out.println("CLIENT>> connected to server!");
-	}
-	
-	public void recivedData(String data) {
-		System.out.println("CLIENT>> recived: " + data);
-		client.sendData("PONG");
+
+	public void recivedData(int id, byte[] data) {
+		System.out.println("Client " + id + " sent: " + new String(data).trim());
 	}
 }
