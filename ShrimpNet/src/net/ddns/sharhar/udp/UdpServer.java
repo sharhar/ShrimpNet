@@ -11,7 +11,6 @@ import java.util.Map;
 public class UdpServer implements Runnable{
 	
 	public class UdpServerClient{
-		DatagramSocket socket;
 		InetAddress address;
 		int port;
 		int num;
@@ -38,7 +37,7 @@ public class UdpServer implements Runnable{
 			
 			DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 			try {
-				socket.send(packet);
+				server.socket.send(packet);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -86,20 +85,18 @@ public class UdpServer implements Runnable{
 	}
 	
 	public void proccesMessage(DatagramPacket packet) {
-		new Thread(() -> {
-			InetAddress address = packet.getAddress();
-			String rawAddress = address.getHostAddress() + ":" + packet.getPort();
-			UdpServerClient client = clients.get(clientIDs.get(rawAddress));
-			if(client != null) {
-				client.recivedData(packet.getData());
-			} else {
-				int idTemp = getId();
-				UdpServerClient temp = new UdpServerClient(this, address, packet.getPort(), idTemp);
-				clients.put(idTemp, temp);
-				clientIDs.put(rawAddress, idTemp);
-				temp.recivedData(packet.getData());
-			}
-		}).start();
+		InetAddress address = packet.getAddress();
+		String rawAddress = address.getHostAddress() + ":" + packet.getPort();
+		UdpServerClient client = clients.get(clientIDs.get(rawAddress));
+		if(client != null) {
+			client.recivedData(packet.getData());
+		} else {
+			int idTemp = getId();
+			UdpServerClient temp = new UdpServerClient(this, address, packet.getPort(), idTemp);
+			clients.put(idTemp, temp);
+			clientIDs.put(rawAddress, idTemp);
+			temp.recivedData(packet.getData());
+		}	
 	}
 	
 	public void run() {
@@ -116,7 +113,9 @@ public class UdpServer implements Runnable{
 				byte[] data = new byte[packetSize];
 				DatagramPacket packet = new DatagramPacket(data, packetSize);
 				socket.receive(packet);
-				proccesMessage(packet);
+				new Thread(() -> {
+					proccesMessage(packet);
+				}).start();
 			}catch (Exception e) {
 				e.printStackTrace();
 			}
