@@ -14,8 +14,8 @@ public class TcpClient implements Runnable{
 	PrintWriter out;
 	BufferedReader in;
 	TcpClientCallback callback;
-	String address;
-	int port;
+	public String address;
+	public int port;
 	
 	public TcpClient(String address, int port, TcpClientCallback callback) {
 		this.callback = callback;
@@ -27,15 +27,6 @@ public class TcpClient implements Runnable{
 	public void start() {
 		running = true;
 		thread.start();
-	}
-	
-	public void stop() {
-		running = false;
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	public void sendData(String data) {
@@ -64,7 +55,7 @@ public class TcpClient implements Runnable{
 		while(running) {
 			try {
 				String input = in.readLine();
-				callback.recivedData(input);
+				callback.receivedData(input);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

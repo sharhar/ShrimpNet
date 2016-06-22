@@ -1,5 +1,5 @@
 package net.ddns.sharhar.udp;
 
 public interface UdpServerCallback {
-	public void recivedData(int id, byte[] data);
+	public void receivedData(int id, byte[] data);
 }

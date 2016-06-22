@@ -37,15 +37,6 @@ public class UdpClient implements Runnable{
 		thread.start();
 	}
 	
-	public void stop() {
-		running = false;
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	public void sendData(byte[] data) {
 		DatagramPacket packet = new DatagramPacket(data, data.length, address, port);
 		try {
@@ -68,7 +59,7 @@ public class UdpClient implements Runnable{
 				DatagramPacket packet = new DatagramPacket(data, packetSize);
 				socket.receive(packet);
 				new Thread(() -> {
-					callback.recivedData(packet.getData());
+					callback.receivedData(packet.getData());
 				}).start();
 			} catch (IOException e) {
 				e.printStackTrace();

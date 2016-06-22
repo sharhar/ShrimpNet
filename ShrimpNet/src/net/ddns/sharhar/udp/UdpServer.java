@@ -26,7 +26,7 @@ public class UdpServer implements Runnable{
 		
 		public void recivedData(byte[] data) {
 			new Thread(() -> {
-				server.callback.recivedData(num, data);
+				server.callback.receivedData(num, data);
 			}).start();
 		}
 		
@@ -44,8 +44,8 @@ public class UdpServer implements Runnable{
 		}
 	}
 	
-	volatile public Map<Integer, UdpServerClient> clients = new HashMap<Integer, UdpServerClient>();
-	volatile public Map<String, Integer> clientIDs = new HashMap<String, Integer>();
+	public volatile Map<Integer, UdpServerClient> clients = new HashMap<Integer, UdpServerClient>();
+	volatile Map<String, Integer> clientIDs = new HashMap<String, Integer>();
 	public UdpServerCallback callback;
 	Thread thread;
 	int port;
@@ -65,18 +65,18 @@ public class UdpServer implements Runnable{
 		this.callback = callback;
 	}
 	
-	public void start() {
-		running = true;
-		thread.start();
+	public UdpServerClient get(int id) {
+		return clients.get(id);
 	}
 	
-	public void stop() {
-		running = false;
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public UdpServerClient get(String address) {
+		return clients.get(clientIDs.get(address));
+	}
+	
+	public void start() {
+		running = true;
+		thread.setPriority(Thread.MAX_PRIORITY);
+		thread.start();
 	}
 	
 	public synchronized int getId() {

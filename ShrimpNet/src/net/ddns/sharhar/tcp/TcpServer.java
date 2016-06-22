@@ -54,7 +54,7 @@ public class TcpServer implements Runnable{
 					tempInput = input;
 					
 					(new Thread(() -> {
-						server.callback.recivedData(num, tempInput);
+						server.callback.receivedData(num, tempInput);
 					})).start();
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -64,7 +64,7 @@ public class TcpServer implements Runnable{
 	}
 	
 	public TcpServerCallback callback;
-	public List<TcpServerClient> clients = new ArrayList<TcpServerClient>();
+	volatile List<TcpServerClient> clients = new ArrayList<TcpServerClient>();
 	ServerSocket server;
 	Thread thread;
 	int port;
@@ -78,16 +78,12 @@ public class TcpServer implements Runnable{
 	
 	public void start() {
 		running = true;
+		thread.setPriority(Thread.MAX_PRIORITY-1);
 		thread.start();
 	}
 	
-	public void stop() {
-		running = false;
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public TcpServerClient get(int id) {
+		return clients.get(id);
 	}
 	
 	public void run() {
